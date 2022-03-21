@@ -6,12 +6,16 @@
 package com.archimatetool.script;
 
 import java.io.File;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.temporal.ChronoUnit;
 import java.util.Map.Entry;
 
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.PlatformUI;
 import org.graalvm.polyglot.PolyglotException;
@@ -35,6 +39,16 @@ public class RunArchiScript {
 	}
 	
 	public void run() {
+	    if(ChronoUnit.DAYS.between(LocalDate.of(2022, Month.APRIL, 22), LocalDate.now()) >= 0) {
+	        if(PlatformUI.isWorkbenchRunning()) {
+	            MessageDialog.openError(null, "jArchi", "Please update to the latest version!");
+	            return;
+	        }
+	        else {
+	            throw new RuntimeException("Please update to the latest version!");
+	        }
+	    }
+	    
         // Get the provider for this file type
 	    IScriptEngineProvider provider = IScriptEngineProvider.INSTANCE.getProviderForFile(file);
         
