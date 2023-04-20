@@ -31,7 +31,12 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.IWorkbenchActionConstants;
@@ -44,6 +49,8 @@ import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 
 import com.archimatetool.editor.actions.AbstractDropDownAction;
+import com.archimatetool.editor.ui.ColorFactory;
+import com.archimatetool.editor.ui.components.GlobalActionDisablementHandler;
 import com.archimatetool.editor.utils.FileUtils;
 import com.archimatetool.editor.utils.PlatformUtils;
 import com.archimatetool.editor.utils.StringUtils;
@@ -84,6 +91,8 @@ extends AbstractFileView  {
     private MarkFolderHiddenAction fActionHideFolder;
 
     
+    private Text fScriptText;
+    
     /**
      * Application Preferences Listener
      */
@@ -115,7 +124,34 @@ extends AbstractFileView  {
     
     @Override
     protected FileTreeViewer createTreeViewer(Composite parent) {
-        return new ScriptsTreeViewer(getRootFolder(), parent);
+        SashForm sash = new SashForm(parent, SWT.HORIZONTAL);
+        sash.setBackground(ColorFactory.get(192, 192, 192));
+        
+        ScriptsTreeViewer viewer = new ScriptsTreeViewer(getRootFolder(), sash);
+        
+        fScriptText = new Text(sash, SWT.H_SCROLL | SWT.V_SCROLL);
+        
+        fScriptText.addFocusListener(new FocusAdapter() {
+            // Ensure global key bindings for the View are not active when this gets the focus
+            private GlobalActionDisablementHandler handler;
+            
+            @Override
+            public void focusGained(FocusEvent e) {
+                fActionRun.setEnabled(true);
+                handler = new GlobalActionDisablementHandler();
+                handler.clearGlobalActions();
+            }
+            
+            @Override
+            public void focusLost(FocusEvent e) {
+                if(handler != null) {
+                    handler.restoreGlobalActions();
+                }
+                updateActions(getViewer().getSelection());
+            }
+        });
+        
+        return viewer;
     }
     
     @Override
@@ -123,7 +159,7 @@ extends AbstractFileView  {
         super.makeActions();
         
         // Run
-        fActionRun = new RunScriptAction();
+        fActionRun = new RunScriptAction(fScriptText);
         fActionRun.setEnabled(false);
         
         // Script

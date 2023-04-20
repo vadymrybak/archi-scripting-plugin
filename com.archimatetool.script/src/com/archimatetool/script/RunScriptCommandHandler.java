@@ -48,8 +48,8 @@ public class RunScriptCommandHandler extends AbstractHandler {
         File file = getScriptFileForParameterValue(parameterValue);
         if(file != null) {
             try {
-                RunArchiScript runner = new RunArchiScript(file);
-                runner.run();
+                RunArchiScript runner = new RunArchiScript();
+                runner.run(file);
             }
             catch(Exception ex) {
                 MessageDialog.openError(null, "Archi Script", ex.getMessage()); //$NON-NLS-1$
