@@ -23,6 +23,7 @@ import org.eclipse.swt.graphics.Image;
 import org.osgi.framework.Bundle;
 
 import com.archimatetool.editor.utils.PlatformUtils;
+import com.archimatetool.editor.utils.StringUtils;
 import com.archimatetool.script.preferences.IPreferenceConstants;
 
 
@@ -65,7 +66,7 @@ public class JSProvider implements IScriptEngineProvider {
     }
     
     @Override
-    public void run(File file, ScriptEngine engine) throws IOException, ScriptException {
+    public void run(File file, ScriptEngine engine) throws IOException, ScriptException {     
         // Initialize jArchi using the provided init.js script
         URL initURL = ArchiScriptPlugin.INSTANCE.getBundle().getEntry("js/init.js");
         try(InputStreamReader initReader = new InputStreamReader(initURL.openStream());) {
@@ -140,6 +141,9 @@ public class JSProvider implements IScriptEngineProvider {
         System.setProperty("polyglot.js.commonjs-require", "true");
         System.setProperty("polyglot.js.commonjs-require-cwd", ArchiScriptPlugin.INSTANCE.getPreferenceStore().getString(IPreferenceConstants.PREFS_SCRIPTS_FOLDER));
 
+    	// Enable debugger if needed
+        enableAndRunDebugger();
+        
         ScriptEngine engine = new ScriptEngineManager().getEngineByName("graal.js");
         
         // See https://www.graalvm.org/reference-manual/js/ScriptEngine/
@@ -154,6 +158,48 @@ public class JSProvider implements IScriptEngineProvider {
 //        bindings.put("polyglot.js.allowAllAccess", true);
 
         return engine;
+    }
+    
+    /**
+     * Enable debugger and open a Chrome Devtools Protocol (CDP) client on:
+     * devtools://devtools/bundled/js_app.html?ws=127.0.0.1:port/uuid
+     */
+    private void enableAndRunDebugger() {
+        boolean enableDebugger = true;							// TODO: Should be get from Preferences or through a "Debug" action
+        String port = "9229";									// TODO: Should be get from Preferences
+        String editor = "/Applications/Microsoft Edge.app";		// TODO: Should be get from Preferences
+        
+        String path = java.util.UUID.randomUUID().toString();
+        String url = "devtools://devtools/bundled/js_app.html?ws=127.0.0.1:" + port + "/" + path;
+
+        // Unset properties by default
+        System.getProperties().remove("polyglot.inspect");
+    	System.getProperties().remove("polyglot.inspect.Path");
+    	
+    	// Debugger AND editor must be configured !
+    	// (when enabled, the script will pause and can be resumed only through a CDP client
+    	//  thus, if the CDP client can't be launched, it will be impossible to resume and Archi will hang)
+        if (!enableDebugger || !StringUtils.isSet(editor)) {
+        	return;
+        }
+        
+    	System.setProperty("polyglot.inspect", port);
+    	System.setProperty("polyglot.inspect.Path", path);
+
+        try {
+            // Windows / Linux
+            String[] paths = new String[] { editor, url };
+            
+            // Mac
+            if(PlatformUtils.isMac()) {
+                paths = new String[] { "open", "-a", editor, url }; //$NON-NLS-1$ //$NON-NLS-2$
+            }
+            
+            Runtime.getRuntime().exec(paths);
+        }
+        catch(IOException ex) {
+            ex.printStackTrace();
+        }
     }
     
     /**
