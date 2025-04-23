@@ -57,6 +57,17 @@ public class ScriptsContextMenuContributionItem extends ContributionItem impleme
         
         menuManager = new MenuManager();
         
+        MenuManager subM = new MenuManager("Run my script");
+        CommandContributionItemParameter param = new CommandContributionItemParameter(PlatformUI.getWorkbench(),
+                null, RunScriptCommandHandler.ID,
+                Map.of(RunScriptCommandHandler.PARAMETER, "s1"),
+                null, null, null, "s1", null, null,
+                CommandContributionItem.STYLE_PULLDOWN,
+                null, true);
+        CommandContributionItem it = new CommandContributionItem(param);
+        subM.add(it);
+        menuManager.add(subM);
+        
         fillItems(menuManager, ArchiScriptPlugin.getInstance().getUserScriptsFolder().listFiles());
         
         for(IContributionItem item : menuManager.getItems()) {

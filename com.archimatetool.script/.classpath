@@ -2,7 +2,21 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry exported="true" kind="lib" path="lib/polyglot-24.1.2.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk17">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry exported="true" kind="lib" path="lib/js-scriptengine-24.1.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/js-language-24.1.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/truffle-api-24.1.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/regex-24.1.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/nativeimage-24.1.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/word-24.1.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/collections-24.1.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/icu4j-24.1.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/chromeinspector-23.0.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/profiler-23.0.7.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

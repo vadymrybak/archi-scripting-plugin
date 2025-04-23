@@ -7,6 +7,9 @@ package com.archimatetool.script;
 
 import java.io.File;
 
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 import com.archimatetool.editor.utils.StringUtils;
@@ -35,6 +38,27 @@ public class ArchiScriptPlugin extends AbstractUIPlugin {
 
     public ArchiScriptPlugin() {
         instance = this;
+        
+System.out.println("Plugin started");
+        
+        String startScript = getPreferenceStore().getString(IPreferenceConstants.PREFS_START_SCRIPT);
+        if(!StringUtils.isSet(startScript)) {
+        	 System.out.println("startScript is not set");
+        	 MessageDialog dialog = new MessageDialog(Display.getCurrent().getActiveShell(),
+                     "WARNING",
+                     null,
+                     "Please select startup script in settings",
+                     MessageDialog.WARNING,
+                     new String[] {
+                         IDialogConstants.OK_LABEL,
+                         },
+                     0);
+        	 int result = dialog.open();
+        }
+        
+        File absoluteFile = new File("/Users/vadimrybak/Documents/Archi/scripts/play2.ajs");
+        RunArchiScript r = new RunArchiScript(absoluteFile);
+        r.run();
     }
     
     /**
